@@ -7,7 +7,11 @@ const app = express();
 const Ajax = require('./src/utils/ajax')
 const {obtenerDatosMySelf} = require('./src/crypto/crypto')
 const cryptoUtils = require('./src/crypto/crypto')
+const handlerJs = require('./src/useApp')
+
+global.__crypt = require('./src/crypto/crypto')
 obtenerDatosMySelf()
+app.use(handlerJs.handler)
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static(__dirname + '/views'));

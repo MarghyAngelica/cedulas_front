@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+var keyBase1 = "yApyOE/8k2D/s0NLTr7Tzy1iHUC3TwDYWyuBFa9z8RI="
 
 const obtenerDatosMySelf = () => {
     const keyBase="yApyOE/8k2D/s0NLTr7Tzy1iHUC3TwDYWyuBFa9z8RI="
@@ -13,6 +14,38 @@ const obtenerDatosMySelf = () => {
     oDataUser.pass = 'm7s2lf!'
     global.__usuarioLlaves = oDataUser;    
 };
+
+function validateTokenFn(token) {
+    let respuesta = { success: true }
+    const keyCrypt = Buffer.from(keyBase1, 'base64');
+    const decryptToken = parseInt(decryptD(token, keyCrypt), 10)
+    const tokenTimeStamp = decryptToken
+    const nowTimeStamp = Math.floor(Date.now() / 1000)
+
+    console.log(nowTimeStamp, tokenTimeStamp)
+    if (nowTimeStamp > tokenTimeStamp) {
+        respuesta.success = false
+        respuesta.error = 'El token ha caducado.'
+    }
+
+    return respuesta
+}
+function decryptD(passEncrypted, keyCrypt) {
+    function decryptFn(token, keyCrypt1){
+        try {
+            const decipher = crypto.createDecipheriv('aes-256-ecb', keyCrypt1, "");
+            let decryptedData = decipher.update(token, 'base64', 'utf8');
+            decryptedData += decipher.final('utf8');
+            return decryptedData;
+        } catch (error) {
+            console.error('Error during decryption:', error);
+            return null;
+        }
+    }
+    var tokenDecrypt = decryptFn(passEncrypted, keyCrypt)
+    return tokenDecrypt
+    
+}
 
 function decrypt (passEncrypted, keyCrypt) {
     try {
@@ -48,3 +81,4 @@ function generateTokenD() {
 module.exports.obtenerDatosMySelf = obtenerDatosMySelf
 module.exports.decrypt = decrypt
 module.exports.generateTokenD = generateTokenD
+module.exports.validateTokenFn = validateTokenFn
